@@ -34,17 +34,17 @@ class DoubleDict(dict):
 
 
 allFields = OrderedDict({
-    'Queries': ('Name', 'Type', 'Class'),
-    'Answers': ('Name', 'Type', 'Class', 'TTL', 'Data length', 'Address'),
-    'Authoritative NS': ('Name', 'Type', 'Class', 'TTL', 'Data length', 'Name Server'),
-    'Additional records': ('Name', 'Type', 'Class', 'TTL', 'Data length', 'Address', 'CNAME')
+    'Queries': {'Name', 'Type', 'Class'},
+    'Answers': {'Name', 'Type', 'Class', 'TTL', 'Data length', 'Address'},
+    'Authoritative NS': {'Name', 'Type', 'Class', 'TTL', 'Data length', 'Name Server'},
+    'Additional records': {'Name', 'Type', 'Class', 'TTL', 'Data length', 'Address', 'CNAME'}
 })
 
-fieldGroups = list(allFields.keys())
+fieldSections = list(allFields.keys())
 
 class DNSPacket:
 
-    def __init__(self, rawdata):
+    def __init__(self, rawdata=None):
         '''при инициализации с байтовым аргументом пакет парсится в self.__records'''
         self.__binarydata = rawdata
         self.classes = {b'\x00\x01': 'IN'}
@@ -57,9 +57,10 @@ class DNSPacket:
                       b'\x00\x1c': 'AAAA',
                       b'\x00\xfc': 'AXFR'})
         
-        self.__records = {g:[] for g in fieldGroups}
+        self.__records = {g:[] for g in fieldSections}
         self.readOffs = 0
         self.offsets = {}
+        self.changed = False
         
         if type(self.__binarydata) != bytes:
             self.__createPacket()
@@ -79,36 +80,23 @@ class DNSPacket:
         self.__binarydata = b''.join([
             itob(packet_id, 2), #transaction ID
             b'\x00\x10', #no flags
-            b'\x00\x01', #only questions
-            b'\x00\x00'*3, #no answers
-            self.strEncode(self.__binarydata[0]),
-            self.types[self.__binarydata[1]],
-            b'\x00\x01'
         ])
         packet_id += 1
 
     def removeField(self, dkey):
         self.__records[dkey].clear()
+        self.changed = True
 
-    def addField(self, dkey, vname=None, vtype=None, data=None, ttl=86400, dlen=4):
-        '''добавляет параметры в self.__records[dkey]'''
-        if dkey == 'Answers':
-            if vname == None:
-                self.__records[dkey].append(data)
-            self.to_app = {'Name': vname,
-                           'Type': vtype, 
-                           'Class': 'IN',
-                           'TTL': ttl,
-                           'Data length': dlen}
-            if vtype == 'A':
-                self.to_app['Address'] = data
-            elif vtype == 'CNAME':
-                self.to_app['CNAME'] = data
-            self.__records[dkey].append(self.to_app)
-        else:
-            self.__records[dkey] = data
+    def addField(self, section, argdict):
+        '''добавляет параметры в self.__records[group]'''
+        if section not in fieldSections:
+            raise KeyError('Unknown DNS-section', section, 'must be one of', fieldSections)
+        if set(argdict.keys()) != allFields[section]:
+            raise KeyError('Wrong section parameters, must be: ' + ', '.join(allFields[section]))
+        self.__records[section].append(argdict)
+        self.changed = True
 
-    def setPointers(self, bstr) -> str:
+    def __setPointers(self, bstr) -> str:
         '''расстановка указателей на строки в бинарном представлении пакета, ищет в дополнительном буфере (не в основном!)'''
         self.pbdata = bytes(self.bindata)
         for i in range(len(bstr)):
@@ -122,28 +110,22 @@ class DNSPacket:
                 return self.strEncode(bstr[:i])[:-1] + self.offsets[self.text]
         return self.strEncode(bstr)
         
-    def serialize(self, indict=None):
+    def __serialize(self):
         '''сериализует словарь в бинарную строку'''
-        if indict == None:
-            indict = self.__records
-        self.lens = [len(indict[i]) for i in fieldGroups]
+        self.lens = [len(self.__records[i]) for i in fieldSections]
         self.bindata = bytearray(b''.join([
-            indict['ID'],
-            indict['Flags']
+            self.__records['ID'],
+            self.__records['Flags']
         ]))
-        self.bindata.extend(b''.join(itob(i, 2) for i in self.lens))
-        print(self.bindata)
+        self.bindata.extend(b''.join([itob(i, 2) for i in self.lens]))
         self.lens = self.lens.__iter__()
-        for fieldgroup in fieldGroups:
-            print(fieldgroup)
+        for fieldsection in fieldSections:
             for counter in range(self.lens.__next__()):
-                print(counter)
-                for field in allFields[fieldgroup]:
+                for field in allFields[fieldsection]:
                     try:
-                        self.itm = indict[fieldgroup][counter][field]
+                        self.itm = self.__records[fieldsection][counter][field]
                     except:
                         continue
-                    print(field, self.itm)
                     if field == 'Type':
                         self.itm = self.types[self.itm]
                     elif field == 'Class':
@@ -159,10 +141,11 @@ class DNSPacket:
                             self.itm = b''.join(map(lambda a: itob(int(a, 16), 1), self.itm.split(':')))  
                     elif field == 'Name' or field == 'Name server' or field == 'CNAME':
                         #print(self.itm, self.bindata)
-                        self.itm = self.setPointers(self.itm.split('.'))
+                        self.itm = self.__setPointers(self.itm.split('.'))
                     self.bindata.extend(self.itm)
         self.__binarydata = bytes(self.bindata)
-        
+        self.changed = False
+
     def __parseAll(self):
         self.hdrs = [None]*6
         try:
@@ -173,7 +156,7 @@ class DNSPacket:
             self.__records['ID'] = self.hdrs[0]
             self.__records['Flags'] = self.hdrs[1]
             self.hdrs = self.hdrs[2:].__iter__()
-            for fgroup in fieldGroups:
+            for fgroup in fieldSections:
                 for _ in range(self.hdrs.__next__()):
                     self.fields = {}
                     self.fields['Name'] = self.strDecode(self.__binarydata[self.readOffs:]).decode('ascii')
@@ -241,9 +224,12 @@ class DNSPacket:
                 return [i[nkey] for i in self.__records[arrs]]
             else:
                 return [i[nkey] for i in self.__records[arrs] if i[cond[0]] == cond[1]]
-        except:
+        except Exception as e:
+            print(e)
             return []
     
     def getRawData(self):
+        if self.changed:
+            self.__serialize()
         return self.__binarydata
     
