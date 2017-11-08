@@ -1,0 +1,184 @@
+body {
+	background-color: #eaffe0;
+}
+
+p {
+	margin: 5px;
+}
+
+input[type="text"] {
+	font-size: 17px;
+	padding-left: 7px;
+}
+
+input[type="button"] {
+	font-size: 120%;
+	border-color: green;
+	text-shadow: 0 0 2px #ffd3a8;
+}
+
+input#cvc {
+	max-width: 40px;
+} 
+
+input::placeholder {
+	font-size: 15px;
+}
+
+div.header > p {
+	margin: 0 0 15px 0;
+	font-size: 1.5em;
+	font-weight: bold;
+	font-family: Georgia, serif;
+	color: green;
+}
+
+footer {
+	width: 100%;
+	position: absolute;
+	left: 0;
+	height: 50px;
+	background-color: #666666;
+	margin: 0;
+}
+
+form {
+	margin: 20px 0 20px 0;
+}
+
+.mainblock {
+	background: linear-gradient(to right, #b7ffb0 0%, #FFFFFF 100%);
+	border-bottom: 2px solid #CDCDCD;
+	border-radius: 10px;
+	margin: 20px 30px;
+	padding: 10px;
+	width: 80%;
+}
+
+.container {
+	margin-left: 20px;
+}
+
+.name {
+	font: 20px Verdana, serif;
+	margin-bottom: 5px;
+	#min-width: 450px;
+}
+
+.contacts {
+	margin-right: 20px;
+	font: 15px Verdana, serif;
+	padding-top: 2px;
+}
+
+.tabs {
+	margin-bottom: 20px;
+}
+
+.tab-link {
+	color: green;
+	font: bold 20px trebuchet ms, serif;
+	text-shadow: 0 0 3px #00FF00;
+	margin-right: 25px;
+}
+
+.tab-link:hover {
+	border-bottom: 2px solid #b0d000;
+	cursor: pointer;
+}
+
+.as-button {
+	color: black;
+	text-shadow: 0 0 1px #ffd3a8;
+	font-size: 90%;
+}
+
+.as-button:hover {
+	border-bottom: none;
+	box-shadow: 0 0 2px black;
+}
+
+.input-field {
+	border: 2px solid #CACACA;
+	height: 25px;
+	border-radius: 10px;
+}
+
+.card-input {
+	margin: 20px 5px 20px 15px;
+	width: 60%;
+}
+
+.labeled-field {
+	margin-bottom: 10px;
+	font: 15px Arial, sans-serif;
+}
+
+.product-placement {
+	margin-top: 20px;
+	border-radius: 3px;
+}
+
+.product {
+	margin: 2px;
+	display: inline-block;
+	width: 270px;
+	height: 120px;
+	border: 3px groove grey;
+	background-color: #e0efff;
+}
+
+.product:hover {
+	box-shadow: 0 0 5px black;
+	cursor: pointer;
+}
+
+.product-caption {
+	text-align: center;
+	border-bottom: 1px dotted black;
+	margin: 0;
+	padding: 15px 0;
+}
+
+.product-price {
+	text-align: center;
+	font: 22px Verdana, sans-serif;
+}
+
+#comments {
+	margin-bottom: 15px;
+}
+
+#card {
+	margin: 0 20px 20px 0;
+	max-width: 420px;
+	height: 230px;
+	background-color: white;
+	border-radius: 15px;
+	box-shadow: 0 0 20px gray;
+	float: left;
+}
+
+#footer-content {
+	height: 20px;
+	font-family: 'Roboto', Arial, sans-serif;
+	font-size: 80%;
+	padding: 18px 0 0 15px;
+}
+
+#pay-data {
+    #float: left;
+	display: inline-block;
+}
+
+#mainblock-payment {
+	min-height: 340px;
+}
+
+#client-info {
+	font: 14px Verdana;
+}
+
+:focus {
+	outline: none;
+}
