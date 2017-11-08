@@ -183,9 +183,8 @@ form {
 	outline: none;
 }
 
-@media screen and (max-device-width: 1080px) {
+@media screen and (max-width: 1080px) {
 	.mainblock {
-		width: 80%;
-		background-color: red;
+		width: 70%;
 	}
 }
