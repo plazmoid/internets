@@ -182,9 +182,3 @@ form {
 :focus {
 	outline: none;
 }
-
-@media screen and (max-width: 1080px) {
-	.mainblock {
-		width: 70%;
-	}
-}
