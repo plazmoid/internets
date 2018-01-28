@@ -1,0 +1,35 @@
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+	overflow: hidden;
+}
+
+td, th {
+    border: 2px solid #d0d0d0;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.breadcrumb {
+	#width: 350px;
+	height: 25px;
+	font: 19px Times, serif;
+	background: linear-gradient(to top, #B0C17A, #fff);
+	border-radius: 15px;
+	margin: 30px;
+}
+
+ul li {
+	list-style-type: none;
+	display: inline-block;
+	padding: 0 10px 0 10px;
+	#border-radius: 0 15px 15px 0;
+	#border-right: 2px solid #fff;
+	box-shadow: 2px 0 0 0 #848484;
+}
+
