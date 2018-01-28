@@ -165,7 +165,7 @@
 			<div class="product" ng-repeat="product in ppdata">
 				<h2 class="product-caption">{{product.name}}</h2>
 				<p class="product-price">{{product.cost}} руб/м<sup>3</sup></p>
-				<img src={{product.img}} style="max-width: 262px; width: 100%; height: 250px">
+				<img src={{product.img}} style="max-width: 500px; width: 100%; height: 250px">
 			</div>
 		</div>
 	</div>
