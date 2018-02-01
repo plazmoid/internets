@@ -1,4 +1,5 @@
 <?
+header('Content-type:text/html; charset=utf-8');
 require_once('api.php');
 
 try {
@@ -8,23 +9,17 @@ try {
 	echo $e;
 }
 
-if($api->getAdmin()) {
-	
-$captions = array(
-	'any_bank' => array('formAB_cap', 'Платежи с карт любых банков'),
-	'your_bank' => array('formYB_cap', 'Платежи со своего банка'),
-	'payment_requests' => array('formPR_cap', 'Запросы платежей')
-);
+if(!$api->getAdmin())
+	exit();
 
-$currform = $captions[$_SESSION['form']];
-header('Content-type:text/html; charset=utf-8');
+$currform = $api->captions[$_SESSION['form']];
 ?>
 <html>
 <head>
 	<title>Админ-панель</title>
 	<link rel="stylesheet" type="text/css" href="css/payments.css">
 	<link rel="stylesheet" type="text/css" href="css/observer.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script type="text/javascript" src="js/angular.min.js"></script>
 	<script type="text/javascript" src="js/angular_content.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -51,7 +46,7 @@ header('Content-type:text/html; charset=utf-8');
 			</div>
 			<table>
 			<? echo "<th ng-repeat='cap in {$currform[0]}'>{{cap}}</th>";
-				while ($row = mysqli_fetch_assoc($api->form)) {
+				while ($row = mysqli_fetch_assoc($api->getForm())) {
 					echo '<tr>';
 					foreach ($row as $key => $val) {
 						echo '<td>'.$val.'</td>';
@@ -84,4 +79,3 @@ header('Content-type:text/html; charset=utf-8');
 	</div>
 </body>
 </html>
-<?}?>
